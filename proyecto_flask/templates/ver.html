@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Ver - Registro Hoyoverse{% endblock %}
+
+{% block content %}
+  <h2>Personajes</h2>
+  {% if characters %}
+    <div class="grid">
+      {% for c in characters %}
+        <div class="card">
+          <div class="card-title">{{ c.nombre }}</div>
+          <div class="card-meta">{{ c.rol }} • {{ c.vision }}</div>
+          <div class="card-tag">{{ c.nacion }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No hay personajes registrados todavía.</p>
+  {% endif %}
+
+  <h2>Armas</h2>
+  {% if weapons %}
+    <div class="grid">
+      {% for w in weapons %}
+        <div class="card">
+          <div class="card-title">{{ w.nombre }}</div>
+          <div class="card-meta">Rareza: {{ w.rarity }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No hay armas registradas todavía.</p>
+  {% endif %}
+
+{% endblock %}

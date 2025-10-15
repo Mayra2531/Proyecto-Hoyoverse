@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Inicio - Registro Hoyoverse{% endblock %}
+
+{% block content %}
+  <section class="hero">
+    <div class="hero-content">
+      <h2>Bienvenido al Registro Hoyoverse</h2>
+      <p>Guarda tus personajes y armas favoritas del universo Genshin / Honkai y revísalos cuando quieras.</p>
+      <div class="hero-actions">
+        <a class="btn primary" href="{{ url_for('nuevo') }}">Registrar nuevo</a>
+        <a class="btn" href="{{ url_for('ver') }}">Ver registros</a>
+      </div>
+    </div>
+    <div class="hero-visual" aria-hidden="true">
+      <div class="xiao-frame floaty">
+        <!-- Embedded illustrative SVG representing Hoyoverse (generic, original) -->
+        <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ilustración Hoyoverse">
+          <defs>
+            <linearGradient id="lg" x1="0" x2="1">
+              <stop offset="0%" stop-color="#ffd29d" />
+              <stop offset="100%" stop-color="#b83b5e" />
+            </linearGradient>
+          </defs>
+          <rect x="0" y="0" width="240" height="240" rx="20" fill="url(#lg)" opacity="0.95" />
+          <g transform="translate(40,40) scale(0.7)" fill="white" opacity="0.95">
+            <!-- stylized swords/vision elements to evoke personajes y armas -->
+            <path d="M40 0 L55 80 L40 80 L25 0 Z"/>
+            <path d="M100 10 L120 60 L110 60 L90 10 Z"/>
+            <circle cx="70" cy="50" r="18" fill="#fff" opacity="0.08" />
+            <circle cx="70" cy="50" r="6" fill="#fff" opacity="0.9" />
+          </g>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section class="about">
+    <h3>¿Qué puedes hacer?</h3>
+    <ul>
+      <li>Registrar personajes con su rol/visión.</li>
+      <li>Registrar armas y su rareza.</li>
+      <li>Ver los registros y gestionar tu colección (sin persistencia por ahora).</li>
+    </ul>
+  </section>
+
+{% endblock %}

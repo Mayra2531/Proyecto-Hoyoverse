@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Proyecto Flask{% endblock %}</title>
+    <!-- Playful font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <header>
+      <div class="header-inner">
+        <div class="logo">🎮 <span>Hoyoverse</span></div>
+        <nav class="nav">
+          <a class="nav-link" href="{{ url_for('index') }}">Inicio</a>
+          <a class="nav-link" href="{{ url_for('nuevo') }}">Nuevo</a>
+          <a class="nav-link" href="{{ url_for('ver') }}">Ver</a>
+        </nav>
+      </div>
+  <!-- decorative blobs removed -->
+    </header>
+    <main>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <ul class="flashes">
+            {% for category, msg in messages %}
+              <li class="flash {{ category }}">{{ msg }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+      <p>&copy; 2025 - Proyecto de laboratorio</p>
+    </footer>
+  </body>
+</html>

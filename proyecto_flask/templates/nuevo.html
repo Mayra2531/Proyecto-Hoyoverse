@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Nuevo - Registro Hoyoverse{% endblock %}
+
+{% block content %}
+  <section class="form-hero">
+    <div class="form-card">
+      <h2>Registrar nuevo elemento</h2>
+      <p class="muted">Agrega personajes o armas al registro. Usa el selector para elegir el tipo.</p>
+
+      <form action="{{ url_for('nuevo') }}" method="post" class="styled-form">
+        <label class="field">
+          <span>Tipo</span>
+          <select id="tipo" name="tipo" onchange="onTipoChange()">
+            <option value="personaje">Personaje</option>
+            <option value="arma">Arma</option>
+          </select>
+        </label>
+
+        <div id="personajeFields" class="fields">
+          <label class="field">
+            <span>Nombre del personaje</span>
+            <input type="text" id="nombre" name="nombre" placeholder="Ej. Xiao">
+          </label>
+          <label class="field">
+            <span>Rol</span>
+            <input type="text" id="rol" name="rol" placeholder="Ej. DPS, Support">
+          </label>
+          <label class="field">
+            <span>Visión</span>
+            <input type="text" id="vision" name="vision" placeholder="Ej. Anemo, Pyro">
+          </label>
+          <label class="field">
+            <span>Nación</span>
+            <input type="text" id="nacion" name="nacion" placeholder="Ej. Liyue, Mondstadt">
+          </label>
+        </div>
+
+        <div id="armaFields" class="fields" style="display:none">
+          <label class="field">
+            <span>Nombre del arma</span>
+            <input type="text" id="nombre_arma" name="nombre_arma" placeholder="Ej. Primordial Jade Cutter">
+          </label>
+          <label class="field">
+            <span>Rareza</span>
+            <input type="text" id="rarity" name="rarity" placeholder="Ej. 5★">
+          </label>
+        </div>
+
+        <div class="actions">
+          <button class="btn primary" type="submit">Guardar</button>
+          <a class="btn" href="{{ url_for('ver') }}">Cancelar</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- illustration removed as requested -->
+  </section>
+
+  <script>
+    function onTipoChange() {
+      const tipo = document.getElementById('tipo').value;
+      document.getElementById('personajeFields').style.display = tipo === 'personaje' ? '' : 'none';
+      document.getElementById('armaFields').style.display = tipo === 'arma' ? '' : 'none';
+    }
+    // inicial
+    onTipoChange();
+  </script>
+{% endblock %}
