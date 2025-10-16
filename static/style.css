@@ -107,3 +107,67 @@ form div { margin-bottom: 0.5rem }
 @media (max-width:800px){
   /* responsive adjustments */
 }
+
+/* Modal styling (usado en templates/ver.html) */
+.modal-backdrop{ display:none; align-items:center; justify-content:center; position:fixed; inset:0; z-index:60; }
+.modal{ background:var(--card); border-radius:12px; padding:20px; max-width:720px; width:96%; box-shadow:0 20px 40px rgba(13,33,54,0.12); border:1px solid rgba(13,33,54,0.04); }
+.modal h3{ margin:0 0 8px 0; color:var(--ink) }
+.modal .muted{ color:var(--muted) }
+.modal .field{ display:block; margin-bottom:0.75rem }
+.modal .field span{ display:block; font-size:0.9rem; color:var(--muted); margin-bottom:6px }
+.modal input{ width:100%; padding:0.55rem 0.65rem; border-radius:8px; border:1px solid rgba(13,33,54,0.08); background:transparent; }
+.modal .actions-row{ display:flex; gap:8px; justify-content:flex-end; margin-top:12px }
+
+.btn.danger{ background:linear-gradient(90deg, rgba(255,77,79,0.12), rgba(255,122,182,0.06)); color:#b21f1f; border:1px solid rgba(255,77,79,0.08); font-weight:700 }
+.btn.danger:hover{ filter:brightness(0.98) }
+
+/* Diff table inside modal */
+.diff-table{ width:100%; border-collapse:collapse; margin-top:10px; font-size:0.95rem }
+.diff-table th, .diff-table td{ border:1px solid rgba(13,33,54,0.06); padding:8px; text-align:left }
+.diff-table tbody tr:nth-child(even){ background: linear-gradient(90deg, rgba(107,155,255,0.02), rgba(255,122,182,0.01)); }
+.diff-table tbody td:nth-child(2){ color:var(--muted) }
+.diff-table tbody td:nth-child(3){ color:var(--ink); font-weight:600 }
+
+/* Ajustes responsive para modal */
+@media (max-width:700px){
+  .modal{ padding:14px }
+  .modal .row{ flex-direction:column }
+  .actions-row{ flex-wrap:wrap }
+}
+
+/* Additional responsive improvements */
+@media (max-width:1100px){
+  .hero{ padding:1.25rem; gap:1rem }
+  .hero-content{ max-width:65% }
+  .form-card{ width:100%; }
+}
+
+@media (max-width:900px){
+  header { padding: 0.75rem 1rem }
+  .logo{ font-size:1rem }
+  .nav .nav-link{ padding:0.35rem 0.5rem }
+  .hero{ flex-direction:column; align-items:flex-start }
+  .hero-content{ max-width:100% }
+  .form-hero{ flex-direction:column }
+  .styled-form .fields{ gap:1rem }
+  #armaFields, .styled-form .fields { flex-direction:column }
+}
+
+@media (max-width:700px){
+  main { padding: 0.75rem }
+  .hero h2{ font-size:1.5rem }
+  .grid{ grid-template-columns: 1fr }
+  .card{ padding:0.85rem }
+  .modal{ width: 96%; max-width: 560px }
+}
+
+@media (max-width:500px){
+  .header-inner{ flex-direction:column; align-items:flex-start; gap:8px }
+  .nav{ width:100% }
+  .nav .nav-link{ display:inline-block; width:calc(50% - 8px); text-align:center }
+  .hero p{ font-size:0.95rem }
+  .form-card{ padding:1rem }
+  .styled-form input, .styled-form select{ padding:0.5rem }
+  .btn{ padding:0.5rem 0.75rem }
+  .modal{ padding:12px }
+}

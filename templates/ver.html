@@ -1,0 +1,245 @@
+{% extends 'base.html' %}
+
+{% block title %}Ver - Registro Hoyoverse{% endblock %}
+
+{% block content %}
+  <style>
+    /* Modal and interactive tweaks local to this page */
+    .card { cursor: pointer; }
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 40; }
+    .modal { background: #fff; border-radius: 8px; padding: 20px; max-width: 720px; width: 95%; box-shadow: 0 8px 30px rgba(0,0,0,0.2); }
+    .modal h3 { margin-top: 0; }
+    .modal .row { display: flex; gap: 12px; }
+    .modal .col { flex: 1; }
+    .diff-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    .diff-table th, .diff-table td { border: 1px solid #eee; padding: 8px; text-align: left; }
+    .muted { color: #666; font-size: .95rem; }
+    .actions-row { display:flex; gap:8px; justify-content:flex-end; margin-top:12px }
+  </style>
+
+  <h2>Personajes</h2>
+  {% if characters %}
+    <div class="grid">
+      {% for c in characters %}
+        <div class="card" role="button" tabindex="0" data-type="personaje" data-item='{{ c|tojson }}' onclick="openModalFromEvent(event)">
+          <div class="card-title">{{ c.nombre }}</div>
+          <div class="card-meta">{{ c.rol }}  {{ c.vision }}</div>
+          <div class="card-tag">{{ c.nacion }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No hay personajes registrados todavía.</p>
+  {% endif %}
+
+  <h2>Armas</h2>
+  {% if weapons %}
+    <div class="grid">
+      {% for w in weapons %}
+        <div class="card" role="button" tabindex="0" data-type="arma" data-item='{{ w|tojson }}' onclick="openModalFromEvent(event)">
+          <div class="card-title">{{ w.nombre }}</div>
+          <div class="card-meta">Rareza: {{ w.rarity }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No hay armas registradas todavía.</p>
+  {% endif %}
+
+  <!-- Modal backdrop -->
+  <div id="modalBackdrop" class="modal-backdrop" onclick="backdropClick(event)">
+    <div class="modal" role="dialog" aria-modal="true" id="itemModal" onclick="event.stopPropagation()">
+      <button style="float:right" onclick="closeModal()">✕</button>
+      <h3 id="modalTitle">Detalle</h3>
+
+      <div id="viewSection">
+        <div id="detailsList" class="muted"></div>
+        <div class="actions-row">
+          <button class="btn" id="editBtn" onclick="startEdit()">Editar</button>
+          <button class="btn danger" id="deleteBtn" onclick="confirmDelete()">Eliminar</button>
+        </div>
+      </div>
+
+      <div id="editSection" style="display:none; margin-top:12px">
+        <form id="editForm" onsubmit="event.preventDefault(); previewChanges();">
+          <div id="editFields"></div>
+          <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:8px">
+            <button class="btn" type="button" onclick="cancelEdit()">Cancelar</button>
+            <button class="btn primary" type="submit">Previsualizar cambios</button>
+          </div>
+        </form>
+      </div>
+
+      <div id="previewSection" style="display:none; margin-top:12px">
+        <h4>Previsualización de cambios</h4>
+        <table class="diff-table" id="diffTable">
+          <thead><tr><th>Campo</th><th>Antes</th><th>Después</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <div class="actions-row">
+          <button class="btn" onclick="cancelPreview()">Volver</button>
+          <button class="btn danger" onclick="confirmUpdate()">Confirmar actualización</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentType = null;
+    let currentItem = null;
+    let originalItem = null;
+
+    function openModalFromEvent(e){
+      const card = e.currentTarget || e.target.closest('.card');
+      const type = card.dataset.type;
+      const item = JSON.parse(card.getAttribute('data-item'));
+      openModal(type, item);
+    }
+
+    function openModal(type, item){
+      currentType = type;
+      currentItem = item;
+      originalItem = JSON.parse(JSON.stringify(item));
+      document.getElementById('modalTitle').innerText = (type === 'personaje') ? item.nombre : item.nombre;
+      renderDetails(item);
+      document.getElementById('editSection').style.display = 'none';
+      document.getElementById('previewSection').style.display = 'none';
+      document.getElementById('viewSection').style.display = '';
+      document.getElementById('modalBackdrop').style.display = 'flex';
+    }
+
+    function closeModal(){
+      document.getElementById('modalBackdrop').style.display = 'none';
+      currentItem = null; currentType = null; originalItem = null;
+    }
+
+    function backdropClick(e){
+      if(e.target.id === 'modalBackdrop') closeModal();
+    }
+
+    function renderDetails(item){
+      const el = document.getElementById('detailsList');
+      if(currentType === 'personaje'){
+        el.innerHTML = `<strong>Nombre:</strong> ${escapeHtml(item.nombre)}<br><strong>Rol:</strong> ${escapeHtml(item.rol)}<br><strong>Visión:</strong> ${escapeHtml(item.vision)}<br><strong>Nación:</strong> ${escapeHtml(item.nacion)}`;
+      } else {
+        el.innerHTML = `<strong>Nombre:</strong> ${escapeHtml(item.nombre)}<br><strong>Rareza:</strong> ${escapeHtml(item.rarity)}`;
+      }
+    }
+
+    function startEdit(){
+      document.getElementById('viewSection').style.display = 'none';
+      const editSection = document.getElementById('editSection');
+      const editFields = document.getElementById('editFields');
+      editFields.innerHTML = '';
+      if(currentType === 'personaje'){
+        editFields.innerHTML += fieldHtml('nombre', 'Nombre', currentItem.nombre);
+        editFields.innerHTML += fieldHtml('rol', 'Rol', currentItem.rol);
+        editFields.innerHTML += fieldHtml('vision', 'Visión', currentItem.vision);
+        editFields.innerHTML += fieldHtml('nacion', 'Nación', currentItem.nacion);
+      } else {
+        editFields.innerHTML += fieldHtml('nombre', 'Nombre', currentItem.nombre);
+        editFields.innerHTML += fieldHtml('rarity', 'Rareza', currentItem.rarity);
+      }
+      editSection.style.display = '';
+    }
+
+    function fieldHtml(name, label, value){
+      return `<label class="field"><span>${label}</span><input name="${name}" value="${escapeAttr(value)}"></label>`;
+    }
+
+    function cancelEdit(){
+      document.getElementById('editSection').style.display = 'none';
+      document.getElementById('viewSection').style.display = '';
+    }
+
+    function previewChanges(){
+      const form = document.getElementById('editForm');
+      const formData = new FormData(form);
+      const newObj = {};
+      if(currentType === 'personaje'){
+        newObj.nombre = (formData.get('nombre')||'').trim();
+        newObj.rol = (formData.get('rol')||'').trim();
+        newObj.vision = (formData.get('vision')||'').trim();
+        newObj.nacion = (formData.get('nacion')||'').trim();
+      } else {
+        newObj.nombre = (formData.get('nombre')||'').trim();
+        newObj.rarity = (formData.get('rarity')||'').trim();
+      }
+
+      // Build diff table
+      const tbody = document.querySelector('#diffTable tbody');
+      tbody.innerHTML = '';
+      const keys = Object.keys(newObj);
+      keys.forEach(k=>{
+        const before = originalItem[k] || '';
+        const after = newObj[k] || '';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${escapeHtml(k)}</td><td>${escapeHtml(before)}</td><td>${escapeHtml(after)}</td>`;
+        tbody.appendChild(tr);
+      });
+
+      // Save new object temporarily
+      currentItem._pendingUpdate = newObj;
+
+      document.getElementById('editSection').style.display = 'none';
+      document.getElementById('previewSection').style.display = '';
+    }
+
+    function cancelPreview(){
+      document.getElementById('previewSection').style.display = 'none';
+      document.getElementById('editSection').style.display = '';
+    }
+
+    async function confirmUpdate(){
+      if(!currentItem || !currentItem._pendingUpdate) return;
+      const ok = confirm('Vas a actualizar este elemento. ¿Deseas continuar? Asegúrate de revisar los cambios.');
+      if(!ok) return;
+
+      const payload = currentItem._pendingUpdate;
+      const id = currentItem.id;
+      const url = (currentType === 'personaje') ? `/personajes/${id}` : `/armas/${id}`;
+
+      try{
+        const res = await fetch(url, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload)});
+        const data = await res.json();
+        if(!res.ok){
+          alert('Error: ' + (data.error || data.message || res.statusText));
+          return;
+        }
+        // on success reload to show flashes and updated list
+        location.reload();
+      }catch(err){
+        alert('Error de red: ' + err.message);
+      }
+    }
+
+    async function confirmDelete(){
+      if(!currentItem) return;
+      const ok = confirm('Estás a punto de eliminar este elemento. Esta acción no se puede deshacer. ¿Continuar?');
+      if(!ok) return;
+      const id = currentItem.id;
+      const url = (currentType === 'personaje') ? `/personajes/${id}` : `/armas/${id}`;
+      try{
+        const res = await fetch(url, { method: 'DELETE' });
+        const data = await res.json();
+        if(!res.ok){
+          alert('Error: ' + (data.error || data.message || res.statusText));
+          return;
+        }
+        location.reload();
+      }catch(err){
+        alert('Error de red: ' + err.message);
+      }
+    }
+
+    // small helpers
+    function escapeHtml(s){ if(s==null) return ''; return String(s).replace(/[&<>\"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+    function escapeAttr(s){ return escapeHtml(s).replace(/'/g, '&#39;'); }
+
+    // keyboard accessibility: open modal on Enter/Space
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape') closeModal();
+    });
+  </script>
+
+{% endblock %}
