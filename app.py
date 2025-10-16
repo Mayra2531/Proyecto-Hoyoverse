@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, jso
 app = Flask(__name__)
 app.secret_key = 'cambiame_por_una_clave_segura'
 
+
 # Datos temporales: listas de diccionarios para personajes y armas
 characters = []
 weapons = []
@@ -149,6 +150,13 @@ def gestionar_arma(arma_id):
     flash('Arma actualizada correctamente.', 'success')
     return jsonify({'message': 'Arma actualizada.', 'arma': arma}), 200
 
+@app.route('/api/personajes', methods=['GET'])
+def api_personajes():
+    return jsonify({'personajes': characters})
+
+@app.route('/api/armas', methods=['GET'])
+def api_armas():
+    return jsonify({'armas': weapons})
 
 if __name__ == '__main__':
     app.run(debug=True)

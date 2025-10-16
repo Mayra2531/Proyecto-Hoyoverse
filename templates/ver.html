@@ -23,7 +23,7 @@
       {% for c in characters %}
         <div class="card" role="button" tabindex="0" data-type="personaje" data-item='{{ c|tojson }}' onclick="openModalFromEvent(event)">
           <div class="card-title">{{ c.nombre }}</div>
-          <div class="card-meta">{{ c.rol }}  {{ c.vision }}</div>
+          <div class="card-meta">{{ c.rol }} | {{ c.vision }}</div>
           <div class="card-tag">{{ c.nacion }}</div>
         </div>
       {% endfor %}
